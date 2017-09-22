@@ -1,0 +1,22 @@
+{
+  "name": "url-shortener-umbrella-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js"
+  },
+  "author": "unixson",
+  "license": "ISC",
+  "dependencies": {
+    "base58": "^1.0.1",
+    "body-parser": "^1.18.1",
+    "config.json": "0.0.4",
+    "express": "^4.15.4",
+    "mongodb": "^2.2.31",
+    "mongoose": "^4.11.12"
+  },
+  "devDependencies": {
+    "nodemon": "^1.12.1"
+  }
+}
