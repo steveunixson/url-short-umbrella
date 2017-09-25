@@ -1,25 +1,17 @@
-//just for a reference
-//Base58.encode(6857269519);
-//Base58.decode('brXijP');
-//TODO: automate a fail scenario and backup at least a port
+var express = require('express');
+var app = express();
+var config = require('config.json')('./config/server.json');
 var bodyParser = require('body-parser');
-var port = 3000; 
-var base58 = require('./base58');
-var express = require('express'); //express init
-var app = express();			 //
-var path = require('path'); //path module init
-var Url = require('./url'); //link the db model
-var config = require('config.json')('./server.json'); //add config file via config.js package
-var mongoose = require('mongoose');
-//`open()` is deprecated in mongoose >= 4.11.0, use `openUri()` instead FIX IT
-mongoose.connect('mongodb://' + config.db_host + '/' + config.db_name, {
-	useMongoClient: true,
-});
-//f*cking body parser DO NOT FORGET IT NEXT TIME!!!
+var path = require('path');
+var MongoClient = require('mongodb').MongoClient;
+var log = require('./libs/log')(module);
+var Url = require('./libs/mongoose').Url;
+var base58 = require('./libs/base58');
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public'))); //too underscores!! 
+app.use(bodyParser.urlencoded({extended: true}));
 
+
+app.use(express.static(path.join(__dirname, "public")));
 app.get('/', function (req, res) {
   res.sendFile(path.join(_dirname, 'public/index.html')); //route to serve a home page
 });
@@ -27,6 +19,7 @@ app.get('/', function (req, res) {
 app.post('/api/shorten', function(req, res){
   var longUrl = req.body.url;
   var shortUrl = '';
+  console.log(req.body.url);
 
   // check if url already exists in database
   Url.findOne({long_url: longUrl}, function (err, doc){
@@ -73,11 +66,26 @@ app.get('/:encoded_id', function(req, res){
   });
 
 });
-
-
-
 //Start HTTP server
-var server = app.listen(port, function () {
-  console.log('We are alive at ' + port);
-  console.log('db_host and db_name variables are ' + config.db_host + '/' + config.db_name);
+var server = app.listen(config.port, function () {
+  log.info('We are alive at ' + config.port);
 });
+//-------------------------------------------------//
+app.use(function(req, res, next){
+    res.status(404);
+    log.debug('Not found URL: %s',req.url);
+    res.send({ error: 'Not found' });
+    return;
+});
+
+app.use(function(err, req, res, next){
+    res.status(err.status || 500);
+    log.error('Internal error(%d): %s',res.statusCode,err.message);
+    res.send({ error: err.message });
+    return;
+});
+
+app.get('/ErrorExample', function(req, res, next){
+    next(new Error('Random error!'));
+});
+//-----------------------------------------------//
