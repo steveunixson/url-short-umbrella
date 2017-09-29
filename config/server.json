@@ -1,6 +1,7 @@
 {
-  "port": 3000,
+  "webhost": "http://localhost:8080",
   "mongoose": {
-        "uri": "mongodb://localhost/urls"
-    }
+        "uri": "mongodb://localhost/url_shortener"
+    },
+    "port": 8080
 }
