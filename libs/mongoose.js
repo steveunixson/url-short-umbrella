@@ -3,12 +3,11 @@
 var log = require('./log')(module);
 var config = require('config.json')('./config/server.json');
 var mongoose = require('mongoose');
-mongoose.Promise = global.Promise; //Deprecation Warning fix kinda works
+mongoose.Promise = global.Promise;
+mongoose.set('debug', true);
 mongoose.connect(config.mongoose.uri, {
   useMongoClient: true,
 });
-//mongoose.set('debug', true);
-
 //-------------------ERROR HANDLER---------------//
 var db = mongoose.connection;
 
@@ -38,18 +37,13 @@ var urlSchema = new Schema({
 
 urlSchema.pre('save', function(next){
   var doc = this;
-  counter.findByIdAndUpdate({_id: 'url_count'}, {$inc: { seq: 1} }, {new: true, upsert: true}).then(function(count, error) {
+  counter.findByIdAndUpdate({_id: 'url_count'}, {$inc: {seq: 1} }, function(error, counter) {
       if (error)
           return next(error);
       doc.created_at = new Date();
-      console.log("...count: "+JSON.stringify(count));
       doc._id = counter.seq;
       next();
-  })
-  .catch(function(error) {
-        console.error("counter error-> : "+error);
-        throw error;
-    });
+  });
 });
 
 log.debug('Mongoose reporting in....');

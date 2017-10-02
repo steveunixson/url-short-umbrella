@@ -1,7 +1,6 @@
 {
-  "webhost": "http://localhost:8080",
+  "webhost": "https://unixson-playground.herokuapp.com",
   "mongoose": {
-        "uri": "mongodb://localhost/url_shortener"
-    },
-    "port": 8080
+        "uri": "mongodb://heroku_r86gqg84:v5jeg964bun23qfdj2512ccvok@ds157584.mlab.com:57584/heroku_r86gqg84"
+    }
 }

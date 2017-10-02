@@ -7,18 +7,17 @@ var mongoose = require('mongoose');
 var log = require('./libs/log')(module);
 var Url = require('./libs/mongoose');
 var base58 = require('./libs/base58');
+var port = process.env.PORT || 8001;
+var favicon = require('serve-favicon');
+app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-
 
 app.use(express.static(path.join(__dirname, "public")));
 app.get('/', function (req, res) {
   res.sendFile(path.join(_dirname, 'public/index.html')); //route to serve a home page
 });
 
-//----------------ERROR HANDLER--------------------------//
-
-//-------------------------------------------------//
 app.post('/api/shorten', function(req, res){
   var longUrl = req.body.url;
   var shortUrl = '';
@@ -70,9 +69,28 @@ app.get('/:encoded_id', function(req, res){
   });
 
 });
-//Start HTTP server
-var server = app.listen(config.port, function () {
-  log.info('We are alive at ' + config.port);
-	log.debug(config.webhost);
+
+//----------------ERROR HANDLER--------------------------//
+/*app.use(function(req, res, next){
+    res.status(404);
+    log.debug('Not found URL: %s',req.url);
+    res.send({ error: 'Not found' });
+    return;
 });
-//-----------------------------------------------//
+
+app.use(function(err, req, res, next){
+    res.status(err.status || 500);
+    log.error('Internal error(%d): %s',res.statusCode,err.message);
+    res.send({ error: err.message });
+    return;
+});
+
+app.get('/ErrorExample', function(req, res, next){
+    next(new Error('Random error!'));
+});*/
+//-------------------------------------------------//
+
+//Start HTTP server
+var server = app.listen(port, function () {
+  console.log('We are alive at ' + port);
+});
